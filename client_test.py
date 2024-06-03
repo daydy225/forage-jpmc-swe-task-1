@@ -1,5 +1,5 @@
 import unittest
-from client3 import getDataPoint
+from client3 import getDataPoint, getRatio
 
 class ClientTest(unittest.TestCase):
   def test_getDataPoint_calculatePrice(self):
@@ -9,8 +9,7 @@ class ClientTest(unittest.TestCase):
     ]
     """ ------------ Add the assertion below ------------ """
     for quote in quotes:
-      stock, bid_price, ask_price, price = getDataPoint(quote)
-      self.assertEqual(price, (bid_price + ask_price)/2)
+      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
 
   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
     quotes = [
@@ -19,12 +18,36 @@ class ClientTest(unittest.TestCase):
     ]
     """ ------------ Add the assertion below ------------ """
     for quote in quotes:
-      stock, bid_price, ask_price, price = getDataPoint(quote)
-      self.assertEqual(price, (bid_price + ask_price)/2)
+      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
 
 
 
   """ ------------ Add more unit tests ------------ """
+  def test_getRatio_calculateRatio(self):
+    price_a = 100
+    price_b = 50
+    self.assertEqual(getRatio(price_a, price_b), 2)
+
+  def test_getRatio_calculateRatioPriceBZero(self):
+    price_a = 100
+    price_b = 0
+    self.assertIsNone(getRatio(price_a, price_b))
+
+  def test_getRatio_calculateRatioPriceAZero(self):
+    price_a = 0
+    price_b = 50
+    self.assertEqual(getRatio(price_a, price_b), 0)
+
+  def test_getRatio_calculateRatioPriceANegative(self):
+    price_a = -100
+    price_b = 50
+    self.assertEqual(getRatio(price_a, price_b), -2)
+
+  def test_getRatio_calculateRatioPriceBNegative(self):
+    price_a = 100
+    price_b = -50
+    self.assertEqual(getRatio(price_a, price_b), -2)
+
 
 
 
