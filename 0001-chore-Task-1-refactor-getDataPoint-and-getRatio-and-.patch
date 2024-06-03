@@ -1,0 +1,48 @@
+From 90a51f800ed7df1403d3292a403f4f340c96d673 Mon Sep 17 00:00:00 2001
+From: daydy225 <dabelydadi@gmail.com>
+Date: Mon, 3 Jun 2024 11:38:45 +0000
+Subject: [PATCH] chore: Task 1 refactor getDataPoint and getRatio and main
+ function
+
+---
+ .gitignore | 2 ++
+ client3.py | 7 +++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..07e5c1f
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++/env
++.vscode
+\ No newline at end of file
+diff --git a/client3.py b/client3.py
+index 3fc09b7..edfeb47 100644
+--- a/client3.py
++++ b/client3.py
+@@ -35,14 +35,17 @@ def getDataPoint(quote):
+     stock = quote['stock']
+     bid_price = float(quote['top_bid']['price'])
+     ask_price = float(quote['top_ask']['price'])
+-    price = bid_price
++    price = (bid_price+ ask_price)/2.0
+     return stock, bid_price, ask_price, price
+ 
+ 
+ def getRatio(price_a, price_b):
+     """ Get ratio of price_a and price_b """
+     """ ------------- Update this function ------------- """
+-    return 1
++    if price_b == 0:
++        # when price_b is 0 avoid throwing ZeroDivisionError
++        return
++    return price_a/price_b
+ 
+ 
+ # Main
+-- 
+2.36.0.windows.1
+
