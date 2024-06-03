@@ -1,0 +1,209 @@
+From 56a6a9bbf801533453d320280e2da5d53f9b682f Mon Sep 17 00:00:00 2001
+From: daydy225 <dabelydadi@gmail.com>
+Date: Mon, 3 Jun 2024 12:14:59 +0000
+Subject: [PATCH 1/4] chore: Apply updates to meet requirements
+
+---
+ ...actor-getDataPoint-and-getRatio-and-.patch | 48 +++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+ create mode 100644 0001-chore-Task-1-refactor-getDataPoint-and-getRatio-and-.patch
+
+diff --git a/0001-chore-Task-1-refactor-getDataPoint-and-getRatio-and-.patch b/0001-chore-Task-1-refactor-getDataPoint-and-getRatio-and-.patch
+new file mode 100644
+index 0000000..8b2499f
+--- /dev/null
++++ b/0001-chore-Task-1-refactor-getDataPoint-and-getRatio-and-.patch
+@@ -0,0 +1,48 @@
++From 90a51f800ed7df1403d3292a403f4f340c96d673 Mon Sep 17 00:00:00 2001
++From: daydy225 <dabelydadi@gmail.com>
++Date: Mon, 3 Jun 2024 11:38:45 +0000
++Subject: [PATCH] chore: Task 1 refactor getDataPoint and getRatio and main
++ function
++
++---
++ .gitignore | 2 ++
++ client3.py | 7 +++++--
++ 2 files changed, 7 insertions(+), 2 deletions(-)
++ create mode 100644 .gitignore
++
++diff --git a/.gitignore b/.gitignore
++new file mode 100644
++index 0000000..07e5c1f
++--- /dev/null
+++++ b/.gitignore
++@@ -0,0 +1,2 @@
+++/env
+++.vscode
++\ No newline at end of file
++diff --git a/client3.py b/client3.py
++index 3fc09b7..edfeb47 100644
++--- a/client3.py
+++++ b/client3.py
++@@ -35,14 +35,17 @@ def getDataPoint(quote):
++     stock = quote['stock']
++     bid_price = float(quote['top_bid']['price'])
++     ask_price = float(quote['top_ask']['price'])
++-    price = bid_price
+++    price = (bid_price+ ask_price)/2.0
++     return stock, bid_price, ask_price, price
++ 
++ 
++ def getRatio(price_a, price_b):
++     """ Get ratio of price_a and price_b """
++     """ ------------- Update this function ------------- """
++-    return 1
+++    if price_b == 0:
+++        # when price_b is 0 avoid throwing ZeroDivisionError
+++        return
+++    return price_a/price_b
++ 
++ 
++ # Main
++-- 
++2.36.0.windows.1
++
+-- 
+2.36.0.windows.1
+
+
+From 3b7a103b15bb050b545a1e48e7a4072876177691 Mon Sep 17 00:00:00 2001
+From: daydy225 <dabelydadi@gmail.com>
+Date: Mon, 3 Jun 2024 13:56:33 +0000
+Subject: [PATCH 2/4] chore: Refactor unit tests to calculate average price in
+ ClientTest
+
+---
+ client_test.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/client_test.py b/client_test.py
+index af2bf26..d666744 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -8,6 +8,9 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
++    for quote in quotes:
++      stock, bid_price, ask_price, price = getDataPoint(quote)
++      self.assertEqual(price, (bid_price + ask_price)/2)
+ 
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+@@ -15,6 +18,10 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
++    for quote in quotes:
++      stock, bid_price, ask_price, price = getDataPoint(quote)
++      self.assertEqual(price, (bid_price + ask_price)/2)
++
+ 
+ 
+   """ ------------ Add more unit tests ------------ """
+-- 
+2.36.0.windows.1
+
+
+From 5d765d608b659208d0c8a5af6f64765f910dcb23 Mon Sep 17 00:00:00 2001
+From: daydy225 <dabelydadi@gmail.com>
+Date: Mon, 3 Jun 2024 14:52:11 +0000
+Subject: [PATCH 3/4] chore: Update client3.py to store prices in a dictionary
+
+---
+ client3.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/client3.py b/client3.py
+index edfeb47..4c65310 100644
+--- a/client3.py
++++ b/client3.py
+@@ -55,8 +55,10 @@ if __name__ == "__main__":
+         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
+ 
+         """ ----------- Update to get the ratio --------------- """
++        prices = {}
+         for quote in quotes:
+             stock, bid_price, ask_price, price = getDataPoint(quote)
++            prices[stock] = price
+             print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
+ 
+-        print("Ratio %s" % getRatio(price, price))
++        print("Ratio %s" % getRatio(prices['ABC'], prices['DEF']))
+-- 
+2.36.0.windows.1
+
+
+From f150ef57b5ec4d4df1c7a9b150a818e21ea620ce Mon Sep 17 00:00:00 2001
+From: daydy225 <dabelydadi@gmail.com>
+Date: Mon, 3 Jun 2024 14:52:44 +0000
+Subject: [PATCH 4/4] chore: Refactor unit tests to include getRatio function
+ and calculate average price in ClientTest
+
+---
+ client_test.py | 33 ++++++++++++++++++++++++++++-----
+ 1 file changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/client_test.py b/client_test.py
+index d666744..8cbacd4 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -1,5 +1,5 @@
+ import unittest
+-from client3 import getDataPoint
++from client3 import getDataPoint, getRatio
+ 
+ class ClientTest(unittest.TestCase):
+   def test_getDataPoint_calculatePrice(self):
+@@ -9,8 +9,7 @@ class ClientTest(unittest.TestCase):
+     ]
+     """ ------------ Add the assertion below ------------ """
+     for quote in quotes:
+-      stock, bid_price, ask_price, price = getDataPoint(quote)
+-      self.assertEqual(price, (bid_price + ask_price)/2)
++      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+ 
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+@@ -19,12 +18,36 @@ class ClientTest(unittest.TestCase):
+     ]
+     """ ------------ Add the assertion below ------------ """
+     for quote in quotes:
+-      stock, bid_price, ask_price, price = getDataPoint(quote)
+-      self.assertEqual(price, (bid_price + ask_price)/2)
++      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+ 
+ 
+ 
+   """ ------------ Add more unit tests ------------ """
++  def test_getRatio_calculateRatio(self):
++    price_a = 100
++    price_b = 50
++    self.assertEqual(getRatio(price_a, price_b), 2)
++
++  def test_getRatio_calculateRatioPriceBZero(self):
++    price_a = 100
++    price_b = 0
++    self.assertIsNone(getRatio(price_a, price_b))
++
++  def test_getRatio_calculateRatioPriceAZero(self):
++    price_a = 0
++    price_b = 50
++    self.assertEqual(getRatio(price_a, price_b), 0)
++
++  def test_getRatio_calculateRatioPriceANegative(self):
++    price_a = -100
++    price_b = 50
++    self.assertEqual(getRatio(price_a, price_b), -2)
++
++  def test_getRatio_calculateRatioPriceBNegative(self):
++    price_a = 100
++    price_b = -50
++    self.assertEqual(getRatio(price_a, price_b), -2)
++
+ 
+ 
+ 
+-- 
+2.36.0.windows.1
+
